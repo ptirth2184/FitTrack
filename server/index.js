@@ -5,6 +5,9 @@ require('dotenv').config();
 const userRoutes = require('./routes/User');
 const workoutRoutes = require('./routes/workout');
 const waterRoutes = require('./routes/water');
+const mealsRoutes = require('./routes/meal');
+const goalsRoutes = require('./routes/goals');
+
 
 const app = express();
 
@@ -13,6 +16,9 @@ app.use(express.json());
 app.use('/user', userRoutes);
 app.use('/workout', workoutRoutes);
 app.use('/water', waterRoutes);
+app.use('/meals', mealsRoutes);
+app.use('/goals', goalsRoutes);
+
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected!'))

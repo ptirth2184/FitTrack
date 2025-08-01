@@ -27,7 +27,6 @@ export default function Navbar() {
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
           <Button color="inherit" component={Link} to="/profile">Profile</Button>
-          <Button color="inherit" component={Link} to="/meals">Meals</Button>
           <Button color="inherit" component={Link} to="/goals">Goals</Button>
           <Button color="inherit" component={Link} to="/badges">Badges</Button>
           <Button color="inherit" component={Link} to="/stats">Stats</Button>

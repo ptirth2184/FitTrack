@@ -1,34 +1,43 @@
 import React, { useState } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Button, Avatar } from '@mui/material';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import OpacityIcon from '@mui/icons-material/Opacity';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+// import LogoutButton from '../components/LogoutButton';
+
+// Import modular components (you need to create MealForm.jsx & MealList.jsx similarly to Workout and Water trackers)
 import WorkoutForm from '../components/WorkoutForm';
 import WorkoutList from '../components/WorkoutList';
 import WaterTracker from '../components/WaterTracker';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import OpacityIcon from '@mui/icons-material/Opacity';
-import LogoutButton from '../components/LogoutButton';
+import MealForm from '../components/MealForm';
+import MealList from '../components/MealList';
 
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user')) || {};
 
-  // State to track which section is selected
+  // Which section details to show: 'workouts', 'water', 'meals' or null for summary only
   const [selectedSection, setSelectedSection] = useState(null);
 
-  // Totals for summary cards
+  // Totals state for summary cards
   const [workoutTotal, setWorkoutTotal] = useState(0);
   const [waterTotal, setWaterTotal] = useState(0);
+  const [mealTotal, setMealTotal] = useState(0);
 
-  // Refresh trigger for WorkoutList after adding workout
+  // Refresh triggers for child lists on form submissions
   const [workoutRefresh, setWorkoutRefresh] = useState(0);
+  const [mealRefresh, setMealRefresh] = useState(0);
 
-  // Callbacks from child components to update totals in dashboard
+  // Callback handlers for updating totals from child components
   const handleWorkoutListUpdate = (count) => {
-    console.log("Workouts total updated:", count);
     setWorkoutTotal(count);
   };
 
   const handleWaterUpdate = (sum) => {
-    console.log("Water total updated:", sum);
     setWaterTotal(sum);
+  };
+
+  const handleMealListUpdate = (count) => {
+    setMealTotal(count);
   };
 
   return (
@@ -44,7 +53,7 @@ export default function Dashboard() {
       }}
     >
 
-      {/* Banner Image with Welcome Text Overlay */}
+      {/* Banner with image and overlaid welcome */}
       <Box
         sx={{
           position: 'relative',
@@ -78,15 +87,16 @@ export default function Dashboard() {
         </Typography>
       </Box>
 
-      {/* User Avatar below Banner */}
+      {/* User avatar centered below banner */}
       <Avatar
         src="https://randomuser.me/api/portraits/men/32.jpg"
         sx={{ width: 72, height: 72, margin: '0 auto', mb: 4 }}
       />
 
-      {/* Summary Cards - Clickable to switch views */}
+      {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={6}>
+        {/* Workouts Card */}
+        <Grid item xs={12} md={4}>
           <Box
             onClick={() => setSelectedSection('workouts')}
             sx={{ cursor: 'pointer' }}
@@ -101,17 +111,17 @@ export default function Dashboard() {
               }}
               elevation={4}
             >
-              <CardContent>
+              <CardContent sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
                     background: 'linear-gradient(120deg, #f7b42c 0%, #fc575e 100%)',
                     width: 48,
                     height: 48,
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: '50%',
-                    marginBottom: 2,
+                    mb: 1,
                   }}
                 >
                   <FitnessCenterIcon sx={{ color: "#fff" }} />
@@ -123,7 +133,8 @@ export default function Dashboard() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        {/* Water Card */}
+        <Grid item xs={12} md={4}>
           <Box
             onClick={() => setSelectedSection('water')}
             sx={{ cursor: 'pointer' }}
@@ -138,17 +149,17 @@ export default function Dashboard() {
               }}
               elevation={4}
             >
-              <CardContent>
+              <CardContent sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
                     background: 'linear-gradient(120deg, #43cea2 0%, #185a9d 100%)',
                     width: 48,
                     height: 48,
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: '50%',
-                    marginBottom: 2,
+                    mb: 1,
                   }}
                 >
                   <OpacityIcon sx={{ color: "#fff" }} />
@@ -159,25 +170,72 @@ export default function Dashboard() {
             </Card>
           </Box>
         </Grid>
+
+        {/* Meals Card */}
+        <Grid item xs={12} md={4}>
+          <Box
+            onClick={() => setSelectedSection('meals')}
+            sx={{ cursor: 'pointer' }}
+          >
+            <Card
+              sx={{
+                background: 'linear-gradient(135deg, #6dd5fa 0%, #2980b9 100%)',
+                color: "#fff",
+                boxShadow: 3,
+                '&:hover': { boxShadow: 6 },
+                transition: 'box-shadow 0.3s ease',
+              }}
+              elevation={4}
+            >
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Box
+                  sx={{
+                    background: 'linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%)',
+                    width: 48,
+                    height: 48,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    mb: 1,
+                  }}
+                >
+                  <RestaurantIcon sx={{ color: "#fff" }} />
+                </Box>
+                <Typography variant="h6">Meals Logged Today</Typography>
+                <Typography variant="h4">{mealTotal}</Typography>
+              </CardContent>
+            </Card>
+          </Box>
+        </Grid>
       </Grid>
 
-      {/* Conditional Rendering of Detail Views */}
-      {selectedSection === 'workouts' && (
-        <>
-          <WorkoutForm onWorkoutLogged={() => setWorkoutRefresh(r => r + 1)} />
-          <WorkoutList refresh={workoutRefresh} updateTotal={handleWorkoutListUpdate} />
-        </>
-      )}
+      {/* Detail Sections Rendering */}
+      <Box sx={{ mt: 3 }}>
+        {selectedSection === 'workouts' && (
+          <>
+            <WorkoutForm onWorkoutLogged={() => setWorkoutRefresh(r => r + 1)} />
+            <WorkoutList refresh={workoutRefresh} updateTotal={handleWorkoutListUpdate} />
+          </>
+        )}
 
-      {selectedSection === 'water' && (
-        <WaterTracker updateTotal={handleWaterUpdate} />
-      )}
+        {selectedSection === 'water' && (
+          <WaterTracker updateTotal={handleWaterUpdate} />
+        )}
 
-      {!selectedSection && (
-        <Typography variant="body1" align="center" color="textSecondary" sx={{ mt: 4 }}>
-          Click on a card above to view details.
-        </Typography>
-      )}
+        {selectedSection === 'meals' && (
+          <>
+            <MealForm onMealLogged={() => setMealRefresh(r => r + 1)} />
+            <MealList refresh={mealRefresh} updateTotal={handleMealListUpdate} />
+          </>
+        )}
+
+        {!selectedSection && (
+          <Typography variant="body1" align="center" color="textSecondary" sx={{ mt: 6 }}>
+            Click on a card above to view and log details.
+          </Typography>
+        )}
+      </Box>
 
       {/* Hide Details Button */}
       {selectedSection && (
