@@ -43,4 +43,32 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Update workout
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { type, duration, calories } = req.body;
+    const updatedWorkout = await Workout.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.userId },
+      { type, duration, calories },
+      { new: true }
+    );
+    if (!updatedWorkout) return res.status(404).json({ message: "Workout not found" });
+    res.json(updatedWorkout);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update workout" });
+  }
+});
+
+// Delete workout
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const deletedWorkout = await Workout.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+    if (!deletedWorkout) return res.status(404).json({ message: "Workout not found" });
+    res.json({ message: "Workout deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete workout" });
+  }
+});
+
+
 module.exports = router;

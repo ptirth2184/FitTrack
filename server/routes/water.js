@@ -44,4 +44,31 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Update water log
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const updatedWater = await WaterLog.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.userId },
+      { amount },
+      { new: true }
+    );
+    if (!updatedWater) return res.status(404).json({ message: "Water log not found" });
+    res.json(updatedWater);
+  } catch {
+    res.status(500).json({ message: "Failed to update water log" });
+  }
+});
+
+// Delete water log
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const deletedWater = await WaterLog.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+    if (!deletedWater) return res.status(404).json({ message: "Water log not found" });
+    res.json({ message: "Water log deleted" });
+  } catch {
+    res.status(500).json({ message: "Failed to delete water log" });
+  }
+});
+
 module.exports = router;

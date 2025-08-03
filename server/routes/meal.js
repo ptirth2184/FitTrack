@@ -44,4 +44,31 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Update meal
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { name, calories, time } = req.body;
+    const updatedMeal = await Meal.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.userId },
+      { name, calories, time },
+      { new: true }
+    );
+    if (!updatedMeal) return res.status(404).json({ message: "Meal not found" });
+    res.json(updatedMeal);
+  } catch {
+    res.status(500).json({ message: "Failed to update meal" });
+  }
+});
+
+// Delete meal
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const deletedMeal = await Meal.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+    if (!deletedMeal) return res.status(404).json({ message: "Meal not found" });
+    res.json({ message: "Meal deleted" });
+  } catch {
+    res.status(500).json({ message: "Failed to delete meal" });
+  }
+});
+
 module.exports = router;
